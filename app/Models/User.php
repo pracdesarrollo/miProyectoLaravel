@@ -45,4 +45,12 @@ class User extends Authenticatable
     {
         return $query->where('email', $email);
     }
+
+    public function isAdmin():bool{
+        return $this->role === 'admin';
+    }
+
+    public function isVendedor(): bool{
+        return $this->role === 'vendor';
+    }
 }
