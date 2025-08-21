@@ -78,7 +78,7 @@
                     </div>
 
                     <div class="d-flex justify-content-between">
-                        <a href="{{ route('products.index') }}" class="btn btn-secondary">Cancelar</a>
+                        <a href="{{ route('dashboard') }}" class="btn btn-secondary">Cancelar</a>
                         <button type="submit" class="btn btn-primary">Guardar Producto</button>
                     </div>
                 </form>
