@@ -1,5 +1,5 @@
 <x-app-layout>
-    <link href="{{ asset('css/main.css') }}" rel="stylesheet">
+    
 
     {{-- Si el usuario es administrador, muestra el dashboard completo --}}
     @if(auth()->user()->isAdmin())

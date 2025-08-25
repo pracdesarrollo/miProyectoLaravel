@@ -7,7 +7,7 @@ use App\Http\Controllers\SaleController;
 use App\Http\Controllers\UserController;
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('index');
 });
 
 Route::get('/dashboard', function () {
@@ -19,9 +19,9 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
-Route::middleware(['auth', 'admin'])->group(function () {
+
     // CRUD completo de productos
-    Route::resource('products', App\Http\Controllers\ProductController::class)->except(['index', 'show']);
+    Route::resource('products', App\Http\Controllers\ProductController::class);
 
     // CRUD de usuarios
     Route::resource('users', App\Http\Controllers\UserController::class);
@@ -29,6 +29,6 @@ Route::middleware(['auth', 'admin'])->group(function () {
     // Rutas adicionales del administrador
     Route::get('/products/low-stock', [App\Http\Controllers\ProductController::class, 'lowStock'])->name('products.low-stock');
     Route::get('/sales/reports', [App\Http\Controllers\SaleController::class, 'reports'])->name('sales.reports');
-});
+
 
 require __DIR__.'/auth.php';

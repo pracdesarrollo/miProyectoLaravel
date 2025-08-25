@@ -1,5 +1,6 @@
 <x-guest-layout>
-    
+     <x-logo-user src="images/person-circle.svg" class= "w-48 h-48"/>
+
     <!-- Session Status -->
     <x-auth-session-status class="mb-4" :status="session('status')" />
 
