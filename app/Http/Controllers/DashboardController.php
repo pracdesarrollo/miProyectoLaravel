@@ -12,34 +12,30 @@ class DashboardController extends Controller
     public function index()
     {
         $user = auth()->user();
+        $data = [];
 
-        // Si el usuario es administrador, carga los datos para el dashboard de administrador
-        if ($user->isAdmin()) {
-            $totalProducts = Product::count();
-            $totalUsers = User::count();
-            $todaySales = Sale::today()->sum('total_price');
-            $lowStockCount = Product::lowStock()->count();
-            $lowStockProducts = Product::lowStock(5, 5); // Obtiene 5 productos con stock bajo
-            $recentSales = Sale::with(['product', 'user'])->orderBy('sale_date', 'desc')->limit(5)->get();
-
-            return view('dashboard.admin.dashboard', compact(
-                'totalProducts',
-                'totalUsers',
-                'todaySales',
-                'lowStockCount',
-                'lowStockProducts',
-                'recentSales'
-            ));
+        // Si el usuario es administrador o gerente
+        if ($user->hasRole('admin') || $user->hasRole('gerente')) {
+            $data['totalProducts'] = Product::count();
+            $data['totalUsers'] = User::count();
+            $data['todaySales'] = Sale::today()->sum('total_price');
+            $data['lowStockCount'] = Product::lowStock()->count();
+            $data['lowStockProducts'] = Product::lowStock(5, 5); 
+            $data['recentSales'] = Sale::with(['product', 'user'])->orderBy('sale_date', 'desc')->limit(5)->get();
         }
 
-        // Si el usuario es vendedor, carga los datos para su dashboard
-        if ($user->isVendedor()) {
-            $recentSales = Sale::where('user_id', $user->id)->latest()->limit(5)->get();
-            
-            return view('dashboard.vendedor.index', compact('recentSales'));
+        // Si el usuario es vendedor
+        if ($user->hasRole('vendedor')) {
+            $data['recentSales'] = Sale::where('user_id', $user->id)->latest()->limit(5)->get();
+            $data['products'] = Product::all();
         }
 
-        // En caso de que no sea ni admin ni vendedor, o para un rol por defecto.
-        return view('dashboard');
+        // Si el usuario es administrador, también carga los productos para la sección de "todos los productos"
+        if ($user->hasRole('admin')) {
+             $data['products'] = Product::all();
+        }
+
+        // Retorna la única vista para todos los roles, pasando los datos necesarios
+        return view('dashboard.general', $data);
     }
 }
