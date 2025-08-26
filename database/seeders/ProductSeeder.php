@@ -1,12 +1,10 @@
-<?php 
-
-
-// database/seeders/ProductSeeder.php
+<?php
 
 namespace Database\Seeders;
 
 use App\Models\Product;
 use Illuminate\Database\Seeder;
+use Database\Factories\ProductFactory;
 
 class ProductSeeder extends Seeder
 {
@@ -34,9 +32,9 @@ class ProductSeeder extends Seeder
                 'name' => 'Leche Entera 1L',
                 'description' => 'Leche entera pasteurizada',
                 'price' => 2.99,
-                'stock' => 8, // Stock bajo
+                'stock' => 8,
                 'category' => 'Alimentos',
-                'exp_date' => now()->addDays(5), // Próximo a vencer
+                'exp_date' => now()->addDays(5),
             ],
             [
                 'name' => 'Smartphone Samsung',
@@ -50,9 +48,9 @@ class ProductSeeder extends Seeder
                 'name' => 'Yogurt Natural',
                 'description' => 'Yogurt natural sin azúcar añadida',
                 'price' => 1.99,
-                'stock' => 0, // Sin stock
+                'stock' => 0,
                 'category' => 'Alimentos',
-                'exp_date' => now()->subDays(2), // Vencido
+                'exp_date' => now()->subDays(2),
             ],
         ];
 
@@ -61,12 +59,12 @@ class ProductSeeder extends Seeder
         }
 
         // Productos adicionales aleatorios
-        Product::factory(45)->create();
+        ProductFactory::new()->count(45)->create();
         
         // Algunos productos con stock bajo
-        Product::factory(5)->lowStock()->create();
+        ProductFactory::new()->count(5)->lowStock()->create();
         
         // Algunos productos vencidos
-        Product::factory(3)->expired()->create();
+        ProductFactory::new()->count(3)->expired()->create();
     }
 }

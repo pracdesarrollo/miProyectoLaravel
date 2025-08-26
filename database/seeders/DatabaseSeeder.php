@@ -1,7 +1,8 @@
 <?php
 
+namespace Database\Seeders;
+
 use App\Models\User;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -11,11 +12,17 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        // El orden es importante para evitar errores de llaves foráneas.
+        // Primero, creamos los roles y los usuarios.
+        $this->call(RolesAndPermissionsSeeder::class);
+        
+        // Luego, los productos, que son necesarios para las ventas.
+        $this->call(ProductSeeder::class);
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
+        // Finalmente, las ventas, ya que dependen de los productos y usuarios.
+        $this->call(SaleSeeder::class);
+
+        // Opcional: Crear usuarios adicionales de prueba
+        User::factory(20)->create();
     }
 }

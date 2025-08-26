@@ -1,8 +1,5 @@
 <?php
 
-
-// database/seeders/SaleSeeder.php
-
 namespace Database\Seeders;
 
 use App\Models\Sale;
