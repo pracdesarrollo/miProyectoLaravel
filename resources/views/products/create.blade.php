@@ -1,87 +1,50 @@
 <x-app-layout>
-<div class="row justify-content-center">
-    <div class="col-md-8">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0">Crear Nuevo Producto</h5>
-            </div>
-            <div class="card-body">
-                <form action="{{ route('products.store') }}" method="POST">
-                    @csrf
-                    
-                    <div class="mb-3">
-                        <label for="name" class="form-label">Nombre *</label>
-                        <input type="text" class="form-control @error('name') is-invalid @enderror" 
-                               id="name" name="name" value="{{ old('name') }}" required>
-                        @error('name')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="category" class="form-label">Categoría</label>
-                        <select class="form-select @error('category') is-invalid @enderror" 
-                                id="category" name="category">
-                            <option value="">Selecciona una opción</option>
-                            <option value="pildoras" {{ old('category') == 'pildoras' ? 'selected' : '' }}>Píldoras</option>
-                            <option value="soluble" {{ old('category') == 'soluble' ? 'selected' : '' }}>Soluble</option>
-                            <option value="jarabe" {{ old('category') == 'jarabe' ? 'selected' : '' }}>Jarabe</option>
-                        </select>
-                        @error('category')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="price" class="form-label">Precio *</label>
-                                <input type="number" step="0.01" min="0" 
-                                       class="form-control @error('price') is-invalid @enderror" 
-                                       id="price" name="price" value="{{ old('price') }}" required>
-                                @error('price')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="stock" class="form-label">Stock *</label>
-                                <input type="number" min="0" 
-                                       class="form-control @error('stock') is-invalid @enderror" 
-                                       id="stock" name="stock" value="{{ old('stock') }}" required>
-                                @error('stock')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="description" class="form-label">Descripción</label>
-                        <textarea class="form-control @error('description') is-invalid @enderror" 
-                                  id="description" name="description" rows="3">{{ old('description') }}</textarea>
-                        @error('description')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label for="exp_date" class="form-label">Fecha de Vencimiento</label>
-                        <input type="date" class="form-control @error('exp_date') is-invalid @enderror" 
-                               id="exp_date" name="exp_date" value="{{ old('exp_date') }}">
-                        @error('exp_date')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <div class="d-flex justify-content-between">
-                        <a href="{{ route('dashboard') }}" class="btn btn-secondary">Cancelar</a>
-                        <button type="submit" class="btn btn-primary">Guardar Producto</button>
-                    </div>
-                </form>
-            </div>
+    <div class="container mx-auto p-4 bg-gray-100 min-h-screen">
+        <div class="bg-white rounded-lg shadow-xl p-8 w-full max-w-md mx-auto">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">Agregar Nuevo Producto</h2>
+            <form id="product-form" action="{{ route('products.store') }}" method="POST">
+                @csrf
+                <!-- Campo de Nombre -->
+                <div class="mb-4">
+                    <label for="name" class="block text-gray-700 text-sm font-bold mb-2">Nombre</label>
+                    <input type="text" id="name" name="name" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                </div>
+                <!-- Campo de Descripción -->
+                <div class="mb-4">
+                    <label for="description" class="block text-gray-700 text-sm font-bold mb-2">Descripción</label>
+                    <input type="text" id="description" name="description" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                </div>
+                <!-- Campo de Precio -->
+                <div class="mb-4">
+                    <label for="price" class="block text-gray-700 text-sm font-bold mb-2">Precio</label>
+                    <input type="number" id="price" name="price" min="0" step="0.01" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                </div>
+                <!-- Campo de Stock -->
+                <div class="mb-4">
+                    <label for="stock" class="block text-gray-700 text-sm font-bold mb-2">Stock</label>
+                    <input type="number" id="stock" name="stock" min="0" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                </div>
+                <!-- Campo de Categoría (Desplegable) -->
+                <div class="mb-4">
+                    <label for="category" class="block text-gray-700 text-sm font-bold mb-2">Categoría</label>
+                    <select id="category" name="category" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                        <option value="Soluble">Soluble</option>
+                        <option value="Pildoras">Píldoras</option>
+                        <option value="Jarabe">Jarabe</option>
+                    </select>
+                </div>
+                <!-- Campo de Fecha de Vencimiento -->
+                <div class="mb-4">
+                    <label for="exp_date" class="block text-gray-700 text-sm font-bold mb-2">Fecha de Vencimiento</label>
+                    <input type="date" id="exp_date" name="exp_date" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                </div>
+                
+                <div class="flex justify-end space-x-4">
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md transition-colors duration-300">
+                        Guardar
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
-</div>
 </x-app-layout>

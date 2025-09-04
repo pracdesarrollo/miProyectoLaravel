@@ -23,19 +23,25 @@ class RolesAndPermissionsSeeder extends Seeder
         Permission::firstOrCreate(['name' => 'view products']);
         Permission::firstOrCreate(['name' => 'create products']);
         Permission::firstOrCreate(['name' => 'edit products']);
+        Permission::firstOrCreate(['name' => 'delete products']);
+
+
 
         // Permisos de usuarios
         Permission::firstOrCreate(['name' => 'view users']);
         Permission::firstOrCreate(['name' => 'create users']);
         Permission::firstOrCreate(['name' => 'edit users']);
+        Permission::firstOrCreate(['name' => 'delete-users']);
         
         // Permisos de ventas
         Permission::firstOrCreate(['name' => 'view sales']);
         Permission::firstOrCreate(['name' => 'create sales']);
-        Permission::firstOrCreate(['name' => 'delete sales']);
+        
 
         // Permisos de reportes
-        Permission::firstOrCreate(['name' => 'view reports']);
+        Permission::firstOrCreate(['name' => 'index reports']);
+        Permission::firstOrCreate(['name' => 'generate reports']);
+
 
         // 2. Crear los roles
         $adminRole = Role::firstOrCreate(['name' => 'admin']);
@@ -44,24 +50,39 @@ class RolesAndPermissionsSeeder extends Seeder
 
         // 3. Asignar permisos a los roles según tus requisitos
         // El Administrador puede hacer TODO
-        $adminRole->givePermissionTo(Permission::all());
+        $adminRole->givePermissionTo([
+            'view products',
+            'create products',
+            'edit products',
+            'delete products',
+            'view users',
+            'create users',
+            'delete-users',
+            'edit users',
+            'view sales',
+            'index reports',
+            'generate reports'
+
+        ]);
 
         // El Gerente puede ver productos, crear usuarios, ver ventas, crear ventas y ver reportes
         $gerenteRole->givePermissionTo([
             'view products',
-            'view users',
-            'create users',
             'view sales',
             'create sales',
-            'view reports'
+            'index reports',
+            'generate reports',
+            'view users',
+            'create users',
+            'edit users'
         ]);
         
         // El Vendedor puede ver productos, crear ventas, ver sus propias ventas y eliminarlas
         $vendedorRole->givePermissionTo([
             'view products',
             'create sales',
-            'view sales',
-            'delete sales'
+            'view sales'
+            
         ]);
 
         // 4. Crear un usuario de ejemplo para cada rol

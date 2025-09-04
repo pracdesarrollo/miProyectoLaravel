@@ -44,6 +44,24 @@
                     @endforelse
                 </div>
             </div>
+            {{-- Acceso las funciones del Admin --}}
+            <div class="flex flex-wrap gap-4 mt-4 justify-center">
+                @can('create users')
+                    <a href="{{ route('users.index') }}" class="mt-4 inline-block px-6 py-3 bg-blue-600 text-white rounded-lg">Gestio de Usuarios</a>
+                @endcan
+                @can('create sales')
+                    <a href="{{ route('sales.index') }}" class="mt-4 inline-block px-6 py-3 bg-blue-600 text-white rounded-lg">Gestios de Ventas</a>
+                @endcan
+                @can('create products')
+                    <a href="{{ route('products.index') }}" class="mt-4 inline-block px-6 py-3 bg-blue-600 text-white rounded-lg">Gestion de Productos</a>
+                @endcan
+                @can('generate reports')
+                    <a href="{{ route('reports.index') }}" class="mt-4 inline-block px-6 py-3 bg-blue-600 text-white rounded-lg">Gestión de Reporte</a>
+                @endcan
+            </div>
+            
+
+
 
         @elseif (auth()->user()->hasRole('gerente'))
             <h1 class="text-3xl font-bold mb-2">Dashboard Gerente</h1>
@@ -63,9 +81,23 @@
             @endcan
 
             {{-- El gerente puede agregar nuevos usuarios --}}
-            @can('create users')
-                <a href="{{ route('users.create') }}" class="mt-4 inline-block px-6 py-3 bg-blue-600 text-white rounded-lg">Crear Nuevo Usuario</a>
-            @endcan
+            
+            {{-- Acceso las funciones del Gerente --}}
+            <div class="flex flex-wrap gap-4 mt-4 justify-center">
+                @can('create users')
+                    <a href="{{ route('users.index') }}" class="mt-4 inline-block px-6 py-3 bg-blue-600 text-white rounded-lg">Gestio de Usuarios</a>
+                @endcan
+                @can('create sales')
+                    <a href="{{ route('sales.index') }}" class="mt-4 inline-block px-6 py-3 bg-blue-600 text-white rounded-lg">Gestios de Ventas</a>
+                @endcan
+                @can('view products')
+                    <a href="{{ route('products.index') }}" class="mt-4 inline-block px-6 py-3 bg-blue-600 text-white rounded-lg">Gestion de Productos</a>
+                @endcan
+                @can('generate reports')
+                    <a href="{{ route('reports.index') }}" class="mt-4 inline-block px-6 py-3 bg-blue-600 text-white rounded-lg">Gestión de Reporte</a>
+                @endcan
+            </div>
+            
 
         @elseif (auth()->user()->hasRole('vendedor'))
             <h1 class="text-3xl font-bold mb-2">Dashboard Vendedor</h1>
@@ -80,22 +112,15 @@
                     <p>No has registrado ventas aún</p>
                 @endforelse
             </div>
-
-            {{-- El vendedor también ve todos los productos disponibles para su venta --}}
-            <div class="bg-white rounded-lg shadow-md p-6 mt-4">
-                <h5 class="text-xl font-semibold">Productos para Venta</h5>
-                @forelse($products as $product)
-                    <div>
-                        <strong class="text-lg">{{ $product->name }}</strong>
-                        @if ($product->stock > 0)
-                            <span class="text-green-500">En stock</span>
-                        @else
-                            <span class="text-red-500">Sin stock</span>
-                        @endif
-                    </div>
-                @empty
-                    <p>No hay productos disponibles</p>
-                @endforelse
+            {{-- Acceso las funciones del Vendedor --}}
+            <div class="flex flex-wrap gap-4 mt-4 justify-center">
+                @can('view products')
+                    <a href="{{ route('products.index') }}" class="mt-4 inline-block px-6 py-3 bg-blue-600 text-white rounded-lg">Gestio de Productos</a>
+                @endcan
+                @can('create sales')
+                    <a href="{{ route('sales.index') }}" class="mt-4 inline-block px-6 py-3 bg-blue-600 text-white rounded-lg">Gestios de Ventas</a>
+                @endcan
+                
             </div>
             
         @endif

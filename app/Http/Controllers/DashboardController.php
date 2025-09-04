@@ -6,12 +6,13 @@ use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\User;
 use App\Models\Sale;
+use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
 {
     public function index()
     {
-        $user = auth()->user();
+        $user = Auth()->user();
         $data = [];
 
         // Si el usuario es administrador o gerente
@@ -21,7 +22,8 @@ class DashboardController extends Controller
             $data['todaySales'] = Sale::today()->sum('total_price');
             $data['lowStockCount'] = Product::lowStock()->count();
             $data['lowStockProducts'] = Product::lowStock(5, 5); 
-            $data['recentSales'] = Sale::with(['product', 'user'])->orderBy('sale_date', 'desc')->limit(5)->get();
+            $data['recentSales'] = Sale::with(['products', 'user'])->orderBy('sale_date', 'desc')->limit(5)->get();
+            $data['products'] = Product::all();
         }
 
         // Si el usuario es vendedor

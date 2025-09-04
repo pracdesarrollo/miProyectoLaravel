@@ -16,13 +16,6 @@ class DatabaseSeeder extends Seeder
         // Primero, creamos los roles y los usuarios.
         $this->call(RolesAndPermissionsSeeder::class);
         
-        // Luego, los productos, que son necesarios para las ventas.
-        $this->call(ProductSeeder::class);
-
-        // Finalmente, las ventas, ya que dependen de los productos y usuarios.
-        $this->call(SaleSeeder::class);
-
-        // Opcional: Crear usuarios adicionales de prueba
-        User::factory(20)->create();
+    
     }
 }

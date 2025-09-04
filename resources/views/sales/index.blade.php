@@ -1,364 +1,201 @@
-{{-- resources/views/users/index.blade.php --}}
-@extends('layouts.app')
+<x-app-layout>
+    <div class="container mx-auto p-4 bg-gray-100 min-h-screen" id="main-content">
+        <div class="flex justify-between items-center mb-4">
+            <h1 class="text-2xl font-bold text-gray-800">Lista de Ventas</h1>
+            @can('create sales')
+                <a href="{{ route('sales.create') }}" class="mt-4 inline-block px-6 py-3 bg-blue-600 text-white rounded-lg">Crear Nueva Venta</a>
+            @endcan
+        </div>
+        @if($sales->isEmpty())
+            <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-4" role="alert">
+                <p class="font-bold">Aviso</p>
+                <p>No hay ninguna venta registrada en su base de datos.</p>
+            </div>
+        @endif
+        
+        <form action="{{ route('sales.index') }}" method="GET">
+            <div class="flex items-center space-x-4 mb-4">
+                <div class="flex-grow">
+                    <input type="text" name="query" placeholder="Buscar por Producto o Vendedor" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+                </div>
+                <button class="bg-gray-400 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded">Buscar</button>
+            </div>
+        </form>
 
-@section('content')
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h1>Usuarios</h1>
-    <a href="{{ route('users.create') }}" class="btn btn-primary">
-        <i class="bi bi-plus"></i> Nuevo Usuario
-    </a>
-</div>
-
-<div class="card">
-    <div class="card-body">
-        <div class="table-responsive">
-            <table class="table table-striped">
+        <div class="bg-white shadow-md rounded-lg overflow-hidden">
+            <table class="min-w-full leading-normal">
                 <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Nombre</th>
-                        <th>Email</th>
-                        <th>Teléfono</th>
-                        <th>Total Compras</th>
-                        <th>Fecha Registro</th>
-                        <th>Acciones</th>
+                    <tr class="bg-green-600 text-white uppercase text-sm font-semibold">
+                        <th class="py-3 px-6 text-left">Folio</th>
+                        <th class="py-3 px-6 text-left">Usuario</th>
+                        <th class="py-3 px-6 text-left">Monto Total</th>
+                        <th class="py-3 px-6 text-left">Fecha de Venta</th>
+                        <th class="py-3 px-6 text-center">Acciones</th>
                     </tr>
                 </thead>
-                <tbody>
-                    @forelse($users as $user)
-                    <tr>
-                        <td>{{ $user->id }}</td>
-                        <td>{{ $user->full_name }}</td>
-                        <td>{{ $user->email }}</td>
-                        <td>{{ $user->phone ?? 'No especificado' }}</td>
-                        <td>
-                            @php
-                                $totalPurchases = $user->sales->sum('total_price');
-                                $purchaseCount = $user->sales->count();
-                            @endphp
-                            <div>${{ number_format($totalPurchases, 2) }}</div>
-                            <small class="text-muted">{{ $purchaseCount }} compras</small>
-                        </td>
-                        <td>{{ $user->created_at->format('d/m/Y') }}</td>
-                        <td>
-                            <div class="btn-group" role="group">
-                                <a href="{{ route('users.show', $user) }}" class="btn btn-sm btn-outline-info">
-                                    <i class="bi bi-eye"></i>
-                                </a>
-                                <a href="{{ route('users.edit', $user) }}" class="btn btn-sm btn-outline-primary">
-                                    <i class="bi bi-pencil"></i>
-                                </a>
-                                <form action="{{ route('users.destroy', $user) }}" method="POST" class="d-inline">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-outline-danger" 
-                                            onclick="return confirm('¿Estás seguro?')">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </form>
-                            </div>
-                        </td>
-                    </tr>
-                    @empty
-                    <tr>
-                        <td colspan="7" class="text-center">No hay usuarios registrados</td>
-                    </tr>
-                    @endforelse
+                <tbody class="text-gray-600 text-sm font-light">
+                    @foreach($sales as $sale)
+                        <tr class="border-b border-gray-200 hover:bg-gray-100">
+                            <td class="py-3 px-6 text-left whitespace-nowrap">{{ $sale->id }}</td>
+                            <td class="py-3 px-6 text-left">{{ $sale->user->name ?? 'Usuario no encontrado' }}</td>
+                            <td class="py-3 px-6 text-left">Q{{ number_format($sale->total_price, 2) }}</td>
+                            <td class="py-3 px-6 text-left">{{ \Carbon\Carbon::parse($sale->sale_date)->format('d/m/Y') }}</td>
+                            <td class="py-3 px-6 text-center">
+                                <div class="flex item-center justify-center space-x-2">
+                                    <!-- Botón para ver detalles de la venta -->
+                                    <a href="{{ route('sales.show', $sale->id) }}" class="w-6 h-6 transform hover:scale-110 text-gray-600">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                                        </svg>
+                                    </a>
+                                    
+                                    <!-- Botón para imprimir recibo 
+                                    <button onclick="showReceipt({{ $sale->id }})" class="w-6 h-6 transform hover:scale-110 text-gray-600">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 6v.75m0 3v.75m0 3v.75m0 3V18m-9-1.5a1.5 1.5 0 0 1 0-3m0 0a.75.75 0 0 0-.214-.525L6.15 8.19a.75.75 0 0 0-.525-.214H5.25A2.25 2.25 0 0 0 3 6v.75m3 2.25V6m0 0l-1.5-1.5M6 6H4.5m0 0l-1.5-1.5M18 18H9m-1.5 0H6.75A.75.75 0 0 1 6 17.25V13.5m0-1.5V12m0 0h.75m-1.5 0H4.5m0 0l-1.5-1.5M18 18v-1.5m0 0V15m0 0H9m-1.5 0H6.75A.75.75 0 0 1 6 14.25V10.5m0-1.5v-1.5m0 0h.75m-1.5 0H4.5m0 0l-1.5-1.5" />
+                                        </svg>
+                                    </button>-->
+                                </div>
+                            </td>
+                        </tr>
+                    @endforeach
                 </tbody>
             </table>
         </div>
-        
-        {{ $users->links() }}
-    </div>
-</div>
-@endsection
 
-{{-- resources/views/users/create.blade.php --}}
-@extends('layouts.app')
-
-@section('content')
-<div class="row justify-content-center">
-    <div class="col-md-8">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0">Crear Nuevo Usuario</h5>
-            </div>
-            <div class="card-body">
-                <form action="{{ route('users.store') }}" method="POST">
-                    @csrf
-                    
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="name" class="form-label">Nombre *</label>
-                                <input type="text" class="form-control @error('name') is-invalid @enderror" 
-                                       id="name" name="name" value="{{ old('name') }}" required>
-                                @error('name')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="last_name" class="form-label">Apellido *</label>
-                                <input type="text" class="form-control @error('last_name') is-invalid @enderror" 
-                                       id="last_name" name="last_name" value="{{ old('last_name') }}" required>
-                                @error('last_name')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="email" class="form-label">Email *</label>
-                        <input type="email" class="form-control @error('email') is-invalid @enderror" 
-                               id="email" name="email" value="{{ old('email') }}" required>
-                        @error('email')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="phone" class="form-label">Teléfono</label>
-                        <input type="text" class="form-control @error('phone') is-invalid @enderror" 
-                               id="phone" name="phone" value="{{ old('phone') }}">
-                        @error('phone')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="password" class="form-label">Contraseña *</label>
-                        <input type="password" class="form-control @error('password') is-invalid @enderror" 
-                               id="password" name="password" required>
-                        @error('password')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="password_confirmation" class="form-label">Confirmar Contraseña *</label>
-                        <input type="password" class="form-control" 
-                               id="password_confirmation" name="password_confirmation" required>
-                    </div>
-
-                    <div class="d-flex justify-content-between">
-                        <a href="{{ route('users.index') }}" class="btn btn-secondary">Cancelar</a>
-                        <button type="submit" class="btn btn-primary">Guardar Usuario</button>
-                    </div>
-                </form>
+        <!-- Modal para el recibo -->
+        <div id="receipt-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden justify-center items-center p-4">
+            <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-lg overflow-y-auto max-h-[90vh]">
+                <div class="flex justify-between items-center border-b pb-3 mb-4">
+                    <h2 class="text-xl font-bold">Vista Previa de Recibo</h2>
+                    <button onclick="closeReceiptModal()" class="text-gray-400 hover:text-gray-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
+                <div id="receipt-content" class="text-gray-700 font-mono">
+                    <!-- El contenido del recibo se cargará aquí dinámicamente -->
+                </div>
+                <div class="mt-4 flex justify-end space-x-2">
+                    <button onclick="printReceipt()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg">Imprimir Recibo</button>
+                    <button onclick="closeReceiptModal()" class="bg-gray-400 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-lg">Cancelar</button>
+                </div>
             </div>
         </div>
     </div>
-</div>
-@endsection
+</x-app-layout>
 
-{{-- resources/views/users/edit.blade.php --}}
-@extends('layouts.app')
+<!-- Coloca el script aquí, justo antes del cierre de <body> -->
+<script>
+    // Asigna los elementos del DOM a constantes para un acceso más fácil
+    const receiptModal = document.getElementById('receipt-modal');
+    const receiptContent = document.getElementById('receipt-content');
+    const mainContent = document.getElementById('main-content');
 
-@section('content')
-<div class="row justify-content-center">
-    <div class="col-md-8">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0">Editar Usuario: {{ $user->full_name }}</h5>
-            </div>
-            <div class="card-body">
-                <form action="{{ route('users.update', $user) }}" method="POST">
-                    @csrf
-                    @method('PUT')
-                    
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="name" class="form-label">Nombre *</label>
-                                <input type="text" class="form-control @error('name') is-invalid @enderror" 
-                                       id="name" name="name" value="{{ old('name', $user->name) }}" required>
-                                @error('name')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="last_name" class="form-label">Apellido *</label>
-                                <input type="text" class="form-control @error('last_name') is-invalid @enderror" 
-                                       id="last_name" name="last_name" value="{{ old('last_name', $user->last_name) }}" required>
-                                @error('last_name')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        </div>
-                    </div>
+    // Función para cerrar el modal del recibo
+    function closeReceiptModal() {
+        receiptModal.classList.add('hidden');
+        receiptModal.classList.remove('flex');
+    }
 
-                    <div class="mb-3">
-                        <label for="email" class="form-label">Email *</label>
-                        <input type="email" class="form-control @error('email') is-invalid @enderror" 
-                               id="email" name="email" value="{{ old('email', $user->email) }}" required>
-                        @error('email')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
+    // Función asíncrona para mostrar la vista previa del recibo
+    async function showReceipt(saleId) {
+        // Muestra un mensaje de carga y el modal
+        receiptContent.innerHTML = '<p class="text-center text-gray-500">Cargando...</p>';
+        receiptModal.classList.add('flex');
+        receiptModal.classList.remove('hidden');
 
-                    <div class="mb-3">
-                        <label for="phone" class="form-label">Teléfono</label>
-                        <input type="text" class="form-control @error('phone') is-invalid @enderror" 
-                               id="phone" name="phone" value="{{ old('phone', $user->phone) }}">
-                        @error('phone')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
+        try {
+            // Realiza una solicitud fetch a la API para obtener los datos de la venta
+            const response = await fetch(`/sales/${saleId}/receipt`);
+            const data = await response.json();
 
-                    <div class="alert alert-info">
-                        <i class="bi bi-info-circle"></i> 
-                        La contraseña no se modificará a menos que especifiques una nueva.
-                    </div>
+            // Verifica si la respuesta es exitosa
+            if (response.ok) {
+                renderReceipt(data);
+            } else {
+                receiptContent.innerHTML = `<p class="text-center text-red-500">Error al cargar el recibo: ${data.message}</p>`;
+            }
+        } catch (error) {
+            // Maneja errores de red
+            receiptContent.innerHTML = '<p class="text-center text-red-500">Error de red. Por favor, revisa tu conexión.</p>';
+        }
+    }
 
-                    <div class="d-flex justify-content-between">
-                        <a href="{{ route('users.index') }}" class="btn btn-secondary">Cancelar</a>
-                        <button type="submit" class="btn btn-primary">Actualizar Usuario</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-@endsection
+    // Función para renderizar el contenido del recibo en el modal
+    function renderReceipt(data) {
+        let itemsHtml = '';
+        let subtotal = 0;
+        const ivaRate = 0.12; // Suponiendo un IVA del 12%
 
-{{-- resources/views/users/show.blade.php --}}
-@extends('layouts.app')
-
-@section('content')
-<div class="row justify-content-center">
-    <div class="col-md-10">
-        <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">Perfil de Usuario: {{ $user->full_name }}</h5>
-                <div>
-                    <a href="{{ route('users.edit', $user) }}" class="btn btn-primary">
-                        <i class="bi bi-pencil"></i> Editar
-                    </a>
-                    <a href="{{ route('users.index') }}" class="btn btn-secondary">
-                        <i class="bi bi-arrow-left"></i> Volver
-                    </a>
+        // Itera sobre los productos para crear la lista de items
+        data.products.forEach(item => {
+            const itemTotal = item.pivot.quantity * item.pivot.price_at_sale;
+            subtotal += itemTotal;
+            itemsHtml += `
+                <div class="flex justify-between items-center mb-1">
+                    <span class="truncate pr-2">${item.name}</span>
+                    <span class="flex-shrink-0">Q${item.pivot.price_at_sale} x ${item.pivot.quantity}</span>
+                    <span class="flex-shrink-0">Q${itemTotal.toFixed(2)}</span>
                 </div>
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-6">
-                        <h6>Información Personal</h6>
-                        <table class="table table-sm">
-                            <tr>
-                                <th>Nombre completo:</th>
-                                <td>{{ $user->full_name }}</td>
-                            </tr>
-                            <tr>
-                                <th>Email:</th>
-                                <td>{{ $user->email }}</td>
-                            </tr>
-                            <tr>
-                                <th>Teléfono:</th>
-                                <td>{{ $user->phone ?? 'No especificado' }}</td>
-                            </tr>
-                            <tr>
-                                <th>Fecha de registro:</th>
-                                <td>{{ $user->created_at->format('d/m/Y H:i') }}</td>
-                            </tr>
-                        </table>
-                    </div>
-                    <div class="col-md-6">
-                        <h6>Estadísticas de Compras</h6>
-                        @php
-                            $totalPurchases = $user->sales->sum('total_price');
-                            $purchaseCount = $user->sales->count();
-                            $avgPurchase = $purchaseCount > 0 ? $totalPurchases / $purchaseCount : 0;
-                            $lastPurchase = $user->sales()->latest('sale_date')->first();
-                        @endphp
-                        
-                        <div class="row text-center">
-                            <div class="col-6">
-                                <div class="card bg-primary text-white">
-                                    <div class="card-body">
-                                        <h4>${{ number_format($totalPurchases, 2) }}</h4>
-                                        <small>Total Gastado</small>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-6">
-                                <div class="card bg-success text-white">
-                                    <div class="card-body">
-                                        <h4>{{ $purchaseCount }}</h4>
-                                        <small>Compras Realizadas</small>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <table class="table table-sm mt-3">
-                            <tr>
-                                <th>Compra promedio:</th>
-                                <td>${{ number_format($avgPurchase, 2) }}</td>
-                            </tr>
-                            <tr>
-                                <th>Última compra:</th>
-                                <td>
-                                    @if($lastPurchase)
-                                        {{ $lastPurchase->sale_date->format('d/m/Y') }}
-                                    @else
-                                        Sin compras
-                                    @endif
-                                </td>
-                            </tr>
-                        </table>
-                    </div>
-                </div>
+            `;
+        });
 
-                <hr>
+        // Calcula el IVA y el total final
+        const ivaAmount = subtotal * ivaRate;
+        const total = subtotal + ivaAmount;
 
-                <h6>Historial de Compras</h6>
-                <div class="table-responsive">
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>Fecha</th>
-                                <th>Producto</th>
-                                <th>Cantidad</th>
-                                <th>Precio Unitario</th>
-                                <th>Total</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse($user->sales()->with('product')->latest('sale_date')->limit(10)->get() as $sale)
-                            <tr>
-                                <td>{{ $sale->sale_date->format('d/m/Y H:i') }}</td>
-                                <td>{{ $sale->product->name ?? 'Producto eliminado' }}</td>
-                                <td>{{ $sale->quantity }}</td>
-                                <td>
-                                    @if($sale->product)
-                                        ${{ number_format($sale->product->price, 2) }}
-                                    @else
-                                        ${{ number_format($sale->total_price / $sale->quantity, 2) }}
-                                    @endif
-                                </td>
-                                <td>${{ number_format($sale->total_price, 2) }}</td>
-                            </tr>
-                            @empty
-                            <tr>
-                                <td colspan="5" class="text-center">No hay compras registradas</td>
-                            </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
+        // Genera el HTML completo del recibo
+        const htmlContent = `
+            <div class="text-sm">
+                <h3 class="font-bold text-center text-lg mb-2">Comprobante de Venta</h3>
+                <hr class="border-gray-400 my-2">
+                <p><strong>Folio Venta:</strong> #${data.id}</p>
+                <p><strong>Fecha:</strong> ${new Date(data.sale_date).toLocaleDateString()}</p>
+                <p><strong>Usuario:</strong> ${data.user.name}</p>
+                <hr class="border-gray-400 my-2">
+                <p class="font-bold">Detalle de Productos:</p>
+                ${itemsHtml}
+                <hr class="border-gray-400 my-2">
+                <div class="flex justify-between font-bold">
+                    <span>Subtotal:</span>
+                    <span>Q${subtotal.toFixed(2)}</span>
                 </div>
-                
-                @if($user->sales()->count() > 10)
-                    <div class="text-center">
-                        <small class="text-muted">Mostrando las últimas 10 compras de {{ $user->sales()->count() }} totales</small>
-                    </div>
-                @endif
+                <div class="flex justify-between font-bold">
+                    <span>IVA:</span>
+                    <span>Q${ivaAmount.toFixed(2)}</span>
+                </div>
+                <div class="flex justify-between font-bold text-lg">
+                    <span>Total:</span>
+                    <span>Q${total.toFixed(2)}</span>
+                </div>
+                <hr class="border-gray-400 my-2">
+                <p class="text-center mt-4">¡Gracias por tu compra!</p>
             </div>
-        </div>
-    </div>
-</div>
-@endsection
+        `;
+        receiptContent.innerHTML = htmlContent;
+    }
+
+    // Función para imprimir el recibo de manera más robusta
+    function printReceipt() {
+        const originalContent = document.body.innerHTML;
+        const receiptContentToPrint = `
+            <style>
+                body { font-family: sans-serif; padding: 24px; }
+                .receipt-container { max-width: 500px; margin: auto; }
+                @media print {
+                    body {
+                        font-size: 10pt;
+                    }
+                    .receipt-container {
+                        width: 100%;
+                    }
+                }
+            </style>
+            <div class="receipt-container">${receiptContent.innerHTML}</div>
+        `;
+        document.body.innerHTML = receiptContentToPrint;
+        window.print();
+        document.body.innerHTML = originalContent;
+    }
+</script>

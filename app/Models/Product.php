@@ -44,4 +44,10 @@ class Product extends Model
     {
         return $query->where('stock', '>', 0);
     }
+    public function sales()
+    {
+        return $this->belongsToMany(Sale::class, 'sale_products')
+                    ->withPivot('quantity', 'price_at_sale')
+                    ->withTimestamps();
+    }
 }

@@ -2,17 +2,18 @@
 
 namespace App\Models;
 
+use App\Models\Product; 
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Sale extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'product_id',
         'user_id',
-        'quantity',
         'sale_date',
         'total_price',
     ];
@@ -20,13 +21,14 @@ class Sale extends Model
     protected $casts = [
         'sale_date' => 'datetime',
         'total_price' => 'decimal:2',
-        'quantity' => 'integer',
     ];
 
     // Relación con producto
-    public function product()
+    public function products(): BelongsToMany
     {
-        return $this->belongsTo(Product::class);
+        return $this->belongsToMany(Product::class, 'sale_product')
+                    ->withPivot('quantity', 'price_at_sale')
+                    ->withTimestamps();
     }
 
     // Relación con usuario
@@ -46,7 +48,7 @@ class Sale extends Model
     {
         $year = $year ?? now()->year;
         return $query->whereMonth('sale_date', $month)
-                    ->whereYear('sale_date', $year);
+                     ->whereYear('sale_date', $year);
     }
 
     // Scope para ventas entre fechas
@@ -65,17 +67,5 @@ class Sale extends Model
         }
         
         return $query->sum('total_price');
-    }
-
-    // Evento para calcular precio total automáticamente
-    protected static function boot()
-    {
-        parent::boot();
-        
-        static::creating(function ($sale) {
-            if (!$sale->total_price && $sale->product) {
-                $sale->total_price = $sale->product->price * $sale->quantity;
-            }
-        });
     }
 }
