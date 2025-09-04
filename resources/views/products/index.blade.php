@@ -2,6 +2,19 @@
 <div class="container mx-auto p-4 bg-gray-100 min-h-screen">
 
     <div class="flex justify-between items-center mb-4">
+        @if(session('success'))
+            <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4" role="alert">
+                <p class="font-bold">¡Éxito!</p>
+                <p>{{ session('success') }}</p>
+            </div>
+        @endif
+
+        @if(session('error'))
+            <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4" role="alert">
+                <p class="font-bold">Error</p>
+                <p>{{ session('error') }}</p>
+            </div>
+        @endif
         <h1 class="text-2xl font-bold text-gray-800">Lista de Productos</h1>
         @can('create products')
                 <a href="{{ route('products.create') }}" class="mt-4 inline-block px-6 py-3 bg-blue-600 text-white rounded-lg">Crear Nuevo Producto</a>
@@ -22,7 +35,7 @@
             </div>
             <button class="bg-gray-400 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded">Buscar</button>
         </div>
-    </from>
+    </form>
 
     <div class="bg-white shadow-md rounded-lg overflow-hidden">
         <table class="min-w-full leading-normal">
@@ -63,13 +76,15 @@
                             </a>
                             {{--Botón de Eliminar--}}
                             <form action="{{ route('products.destroy', $product->id) }}" method="POST">
-                              @csrf
-                              @method('DELETE')
-                                <button type="submit" class="w-6 h-6 transform hover:scale-110 text-red-500">
-                                   {{-- Aquí va el SVG del icono de borrar --}}
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                    </svg>
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" 
+                                    class="w-6 h-6 transform hover:scale-110 text-red-500" 
+                                    onclick="return confirm('¿Estás seguro de que deseas eliminar este producto?');">
+                                    {{-- SVG Icon --}}
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                        </svg>
                                 </button>
                             </form>
                         </div>

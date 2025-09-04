@@ -39,7 +39,7 @@ class ReportController extends Controller
             foreach ($sales as $sale) {
                 foreach ($sale->products as $product) {
                     $salesData[] = [
-                        'sale_date' => Carbon::parse($sale->sale_date)->format('Y-m-d'),
+                        'sale_date' => Carbon::parse($sale->sale_date)->format('d-M-Y'),
                         'product_name' => $product->name,
                         'quantity' => $product->pivot->quantity,
                         'unit_price' => number_format($product->pivot->price_at_sale, 2),
@@ -51,8 +51,8 @@ class ReportController extends Controller
             return response()->json([
                 'status' => 'success',
                 'sales' => $salesData,
-                'startDate' => $startDate->format('Y-m-d'),
-                'endDate' => $endDate->format('Y-m-d'),
+                'startDate' => $startDate->format('d-M-Y'),
+                'endDate' => $endDate->format('d-M-Y'),
             ]);
 
         } catch (\Exception $e) {
